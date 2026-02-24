@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service Exam Practice</title>
+    <style>
+        body { font-family: -apple-system, sans-serif; background: #f4f7f9; padding: 20px; display: flex; justify-content: center; }
+        .quiz-container { max-width: 600px; width: 100%; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+        h1 { color: #007aff; text-align: center; font-size: 24px; margin-bottom: 10px; }
+        .progress { color: #8e8e93; text-align: center; margin-bottom: 20px; font-size: 14px; }
+        .question { font-size: 18px; font-weight: 600; line-height: 1.4; margin-bottom: 25px; color: #1c1c1e; }
+        .option { background: #f1f1f7; padding: 16px; margin-bottom: 12px; border-radius: 12px; cursor: pointer; border: 2px solid transparent; transition: 0.2s; }
+        .option:hover { background: #e5e5ea; }
+        .correct { background: #34c759 !important; color: white; border-color: #34c759; }
+        .wrong { background: #ff3b30 !important; color: white; border-color: #ff3b30; }
+        .nav-buttons { display: flex; justify-content: space-between; margin-top: 30px; gap: 15px; }
+        button { flex: 1; padding: 15px; border: none; border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; }
+        #prev-btn { background: #e5e5ea; color: #000; }
+        #next-btn { background: #007aff; color: #white; }
+        button:disabled { opacity: 0.3; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <h1>✈️ Service Quiz</h1>
+        <div class="progress" id="progress">載入中...</div>
+        <div id="quiz-area">
+            <div class="question" id="question-text"></div>
+            <div id="options-container"></div>
+            <div class="nav-buttons">
+                <button id="prev-btn" onclick="prevQ()">上一題</button>
+                <button id="next-btn" onclick="nextQ()">下一題</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const quizData = [
+            {q: "NLML does not allow any dairy product (e.g. cheese, butter, etc.) sweet and chocolates, etc.", opts: ["LSML", "NLML", "BLML", "GFML"], ans: "NLML"},
+            {q: "Is the only SPML that crew must bring the meal box to PAXs for verification and must break the box seal before heating.", opts: ["SFML and FPML", "KSML", "NLML", "VGML"], ans: "KSML"},
+            {q: "Supper is provided for the flights taking off during:", opts: ["21:01~04:59", "20:01~03:59", "22:01~05:59", "18:01~00:59"], ans: "21:01~04:59"},
+            {q: "A PAX requests CC to arrange a strict Indian vegetarian Jain meal. The CORRECT IATA code is:", opts: ["VOML", "AVML", "VJML", "RVML"], ans: "VJML"},
+            {q: "A person who is on a 'lacto-ovo' diet may be able to consume:", opts: ["Alcohol and gelatine", "Meats", "Dairy products and eggs", "Seafood"], ans: "Dairy products and eggs"},
+            {q: "A321 neo, Cabin Crew can control the cabin temperature from:", opts: ["FAP", "AAP", "ACP", "AIP"], ans: "FAP"},
+            {q: "A321 neo, how long does it take for the temperature to stabilize after adjusting?", opts: ["30 minutes", "30 seconds", "20 seconds", "20 minutes"], ans: "20 minutes"},
+            {q: "NBML must be ordered ___ hours before the scheduled departure time.", opts: ["72", "24", "36", "48"], ans: "24"},
+            {q: "CC should perform cabin patrol every ___ minutes.", opts: ["15", "20", "30", "60"], ans: "30"},
+            {q: "Vegetarian Lacto-Ovo meals do not include:", opts: ["Dairy", "Eggs", "GELATIN", "Grains"], ans: "GELATIN"},
+            {q: "The definition of S flight is the scheduled flight time:", opts: ["< 2.5 hours", "Between 2.5~4 hours", "> 4 hours", "1 hour"], ans: "Between 2.5~4 hours"},
+            {q: "While pre-landing, what colour of seal should be used to seal the DFS carts?", opts: ["Red", "WHITE", "Yellow", "Blue"], ans: "WHITE"}
+        ];
+
+        let currentQ = 0;
+
+        function showQ() {
+            const data = quizData[currentQ];
+            document.getElementById('progress').innerText = `第 ${currentQ + 1} 題 / 共 ${quizData.length} 題`;
+            document.getElementById('question-text').innerText = data.q;
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+            data.opts.forEach(opt => {
+                const div = document.createElement('div');
+                div.className = 'option';
+                div.innerText = opt;
+                div.onclick = () => {
+                    if (div.innerText === data.ans) {
+                        div.classList.add('correct');
+                    } else {
+                        div.classList.add('wrong');
+                        Array.from(container.children).forEach(child => {
+                            if (child.innerText === data.ans) child.classList.add('correct');
+                        });
+                    }
+                    Array.from(container.children).forEach(child => child.style.pointerEvents = 'none');
+                };
+                container.appendChild(div);
+            });
+            document.getElementById('prev-btn').disabled = currentQ === 0;
+        }
+
+        function nextQ() {
+            if (currentQ < quizData.length - 1) {
+                currentQ++;
+                showQ();
+            }
+        }
+
+        function prevQ() {
+            if (currentQ > 0) {
+                currentQ--;
+                showQ();
+            }
+        }
+
+        showQ();
+    </script>
+</body>
+</html>
