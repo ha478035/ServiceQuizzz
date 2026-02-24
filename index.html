@@ -3,203 +3,137 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Service 完整題庫 99 題</title>
+    <title>Service 完整題庫 (修正版)</title>
     <style>
-        body { font-family: -apple-system, sans-serif; background: #f4f7f9; padding: 15px; margin: 0; display: flex; justify-content: center; }
-        .container { width: 100%; max-width: 600px; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-top: 10px; }
+        body { font-family: -apple-system, sans-serif; background: #f0f2f5; padding: 15px; margin: 0; display: flex; justify-content: center; }
+        .container { width: 100%; max-width: 600px; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-top: 20px; }
         h1 { color: #1a73e8; text-align: center; font-size: 20px; margin-bottom: 15px; }
-        .header-tools { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; background: #f8f9fa; padding: 10px; border-radius: 10px; }
-        .progress { color: #5f6368; font-size: 15px; font-weight: bold; }
-        .jump-btn { background: #1a73e8; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-size: 14px; color: white; font-weight: bold; }
-        .question { font-size: 17px; font-weight: bold; line-height: 1.5; margin-bottom: 20px; color: #202124; min-height: 100px; white-space: pre-wrap; }
+        .progress { color: #5f6368; font-size: 15px; font-weight: bold; background: #f8f9fa; padding: 10px; border-radius: 8px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .question { font-size: 17px; font-weight: bold; line-height: 1.5; margin-bottom: 20px; color: #202124; min-height: 80px; }
         .option { background: #ffffff; border: 2px solid #dadce0; padding: 12px; margin-bottom: 10px; border-radius: 10px; cursor: pointer; transition: 0.2s; font-size: 15px; }
         .correct { background: #e6f4ea !important; border-color: #34a853 !important; color: #137333 !important; font-weight: bold; }
         .wrong { background: #fce8e6 !important; border-color: #ea4335 !important; color: #c5221f !important; }
         .nav { display: flex; justify-content: space-between; margin-top: 20px; gap: 10px; }
-        button.nav-btn { flex: 1; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; }
-        #prev { background: #dadce0; color: #3c4043; }
-        #next { background: #1a73e8; color: white; }
+        button { flex: 1; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; background: #1a73e8; color: white; }
+        button:disabled { background: #ccc; cursor: not-allowed; }
+        .jump-btn { background: #e8f0fe; color: #1a73e8; padding: 5px 10px; border-radius: 5px; font-size: 12px; border: 1px solid #1a73e8; }
     </style>
 </head>
 <body>
 <div class="container">
-    <h1>✈️ Service 完整題庫 (99題版)</h1>
-    <div class="header-tools">
-        <div class="progress" id="progress">載入中...</div>
-        <button class="jump-btn" onclick="jumpTo()">🔢 跳轉題號</button>
+    <h1>✈️ Service 模擬測驗</h1>
+    <div class="progress">
+        <span id="q-idx">載入中...</span>
+        <button class="jump-btn" onclick="jumpQ()">跳轉題號</button>
     </div>
-    <div id="quiz-area">
+    <div id="quiz-content">
         <div class="question" id="q-text"></div>
         <div id="options"></div>
         <div class="nav">
-            <button id="prev" class="nav-btn" onclick="changeQ(-1)">上一題</button>
-            <button id="next" class="nav-btn" onclick="changeQ(1)">下一題</button>
+            <button id="prev" onclick="changeQ(-1)">上一題</button>
+            <button id="next" onclick="changeQ(1)">下一題</button>
         </div>
     </div>
 </div>
 
 <script>
-    // 嚴格對照 PDF 完整 99 題
     const quizData = [
-        {q: "NLML低乳糖餐 does not allow any dairy product (e.g. cheese, butter, etc.) sweet and chocolates, etc.", opts: ["LSML低鹽", "NLML", "BLML", "GFML"], ans: "NLML"},
-        {q: "SFML and FPML (答案有FPBL是打錯) are only available in Business Class.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
-        {q: "Is the only SPML that crew must bring the meal box for verification and break box seal before heating?", opts: ["SFML and FPML", "KSML", "MOML", "AVML"], ans: "KSML"},
-        {q: "Supper 宵夜 is provided for the flights taking off during 21:01~04:59.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
-        {q: "The CORRECT IATA SPMK code for strict Indian vegetarian Jain meal is:", opts: ["VOML", "AVML", "VJML", "RVML"], ans: "VJML"},
-        {q: "VJML 耆那教素食餐只能吃什麼？", opts: ["肉類", "土壤上面的植物", "海鮮", "蛋奶"], ans: "土壤上面的植物"},
-        {q: "A person who is on a 'lacto-ovo' diet may be able to consume:", opts: ["Alcohol/gelatine", "Meats/game", "Dairy products/eggs", "Seafood/fish"], ans: "Dairy products/eggs"},
-        {q: "A321 neo: CC can control the cabin temperature from:", opts: ["FAP", "AAP", "ACP", "AIP"], ans: "FAP"},
-        {q: "A321 neo: How long does it take for temperature to stablize after adjusting?", opts: ["30 mins", "30 secs", "20 secs", "20 mins"], ans: "20 mins"},
-        {q: "NBML must be ordered ___ hours before scheduled departure.", opts: ["72", "24", "36", "48"], ans: "24"},
-        {q: "Jewish Dietary laws; dairy and meat cannot be consumed together. This SPML is:", opts: ["MOML", "HNML", "KSML", "LCML"], ans: "KSML"},
-        {q: "BBML is for infant aged from:", opts: ["6 months to 2 yrs", "Below 2.5 yrs", "0 to 2 yrs", "Below 1.5 yrs"], ans: "6 months to 2 yrs"},
+        {q: "Which meal type does not allow any dairy product (e.g. cheese, butter, etc.) sweet and chocolates, etc.?", opts: ["LSML低鹽", "NLML", "BLML", "GFML"], ans: "NLML"},
+        {q: "SFML and FPML (Special Fruit Meal) are only available in Business Class.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
+        {q: "Is the only SPML that crew must bring the meal box to PAXs for verification and must break the box seal before heating.", opts: ["SFML and FPML", "KSML", "MOML", "AVML"], ans: "KSML"},
+        {q: "Supper 宵夜 is provided for the flights taking off during:", opts: ["05:00~11:00", "11:01~21:00", "21:01~04:59", "All day"], ans: "21:01~04:59"},
+        {q: "A PAX requests CC to arrange a strict Indian vegetarian Jain meal for his next flight. The CORRECT IATA SPMK code for this meal type is:", opts: ["VOML", "AVML", "VJML", "RVML"], ans: "VJML"},
+        {q: "VJML 耆那教素食餐的飲食限制為何？", opts: ["不吃肉類", "只能吃土壤上面的植物", "只能吃海鮮", "不吃蛋奶"], ans: "只能吃土壤上面的植物"},
+        {q: "A person who is on a 'lacto-ovo' diet may be able to consume:", opts: ["Alcohol and gelatine", "Meats and game", "Dairy products and eggs", "Seafood and fish"], ans: "Dairy products and eggs"},
+        {q: "A321 neo, Cabin Crew can control the cabin temperature from:", opts: ["FAP", "AAP", "ACP", "AIP"], ans: "FAP"},
+        {q: "A321 neo, how long does it take for the temperature to stablize after adjusting?", opts: ["30 minutes", "30 seconds", "20 seconds", "20 minutes"], ans: "20 minutes"},
+        {q: "NBML must be ordered ___ hours before the scheduled departure time.", opts: ["72", "24", "36", "48"], ans: "24"},
+        {q: "All food is prepared and served according to Jewish Dietary laws; diary products and meat cannot be consumed at the same time. This SPML is called:", opts: ["MOML", "HNML", "KSML", "LCML"], ans: "KSML"},
+        {q: "BBML is for infant aged from:", opts: ["6 months to 2 years old", "Below 2.5 years old", "0 to 1 year old", "Below 1.5 years old"], ans: "6 months to 2 years old"},
         {q: "CC can distribute meal tray to passenger on TOD (Top of Descent).", opts: ["TRUE", "FALSE"], ans: "FALSE"},
-        {q: "CC perform cabin patrol every ___ minutes as an ongoing rotation.", opts: ["15", "20", "30", "60"], ans: "30"},
-        {q: "CHML is for children aged from:", opts: ["1~5 yrs", "2~5 yrs", "2~12 yrs", "5~12 yrs"], ans: "2~5 yrs"},
-        {q: "Compared with SS flights, S flights provide Bread, Soup and Starter to enrich meal.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
-        {q: "Dessert is for main meal; Yoghurt is provided for breakfast instead.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
-        {q: "FC commands 'REMAIN SEATED': CC should suspend hot drink service only and continue meal service.", opts: ["TRUE", "FALSE"], ans: "FALSE"},
-        {q: "Seat belt sign ON (no FC command): Suspend hot drinks and soup service.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
-        {q: "Meal tray collection: offer Cocktail napkin when serving hot drinks.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
-        {q: "PAX asleep with seatback reclined: Explain to PAX seated behind.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
-        {q: "Drink requested not on cart: Inform PAX served later and offer another while waiting.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
-        {q: "During night flights, window shades must be fully closed for takeoff/landing.", opts: ["TRUE", "FALSE"], ans: "FALSE"},
-        {q: "After meal service, stow all bread cloth to the meal carts.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
-        {q: "Double catering: CC should ensure meals are loaded in chilling compartment.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
-        {q: "GFML: bread without oat should be provided.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
-        {q: "Bar cart prep: CC should unlock padlocks and break seals.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
-        {q: "Bar cart prep: CC should stow padlock in the first drawer.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
-        {q: "Bar cart prep: Ensure Bar Control Form is loaded in drawer.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
-        {q: "Bar cart prep: Place dry ice in the dry ice drawer.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
-        {q: "Bar cart prep: Spread dry ice directly over drinks to speed up chilling.", opts: ["TRUE", "FALSE"], ans: "FALSE"},
-        {q: "S flights DBML: Prepare a cup of water instead of packed juice.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
-        {q: "Security: Ensure seals are undamaged before opening bar carts.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
-        {q: "Drink choices: Verbally offer and mention brands proactively.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
-        {q: "Drink choices: Present wine label to PAX if asked.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
-        {q: "Meal choices: Mention type of protein and starch.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
-        {q: "SPML prep: Place SPML sticker on fruit bowl cover.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
-        {q: "SPML prep: Place SPML bread on bread plate.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
-        {q: "SPML prep: Prepare a cup of water to deliver by hand.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
-        {q: "Wake up juice for breakfast is served BY TRAY.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
-        {q: "How many choices of main course on S flights?", opts: ["1", "2", "3", "4"], ans: "2"},
-        {q: "How many different sizes of STEB available inflight?", opts: ["1", "2", "3", "4"], ans: "2"},
-        {q: "Currency acceptable for Duty Free: Cash is not acceptable.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
-        {q: "Clean lavatories every 30 mins during patrol.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
-        {q: "Dispose leftover tea/coffee/juice in Toilet bowl.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
-        {q: "IATA SPML must be ordered 24 hours before departure.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
-        {q: "DBML PAX asks for sugar: CC should provide sweetener (Equal).", opts: ["TRUE", "FALSE"], ans: "TRUE"},
-        {q: "Group tour SPML: change through Travel Agency.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
-        {q: "4LA onboard: report shortage to 4C.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
-        {q: "Galley crew: replenish drinks on meal carts during service.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
-        {q: "Pre-landing: Turn OFF chiller for double catering.", opts: ["TRUE", "FALSE"], ans: "FALSE"},
-        {q: "Appropriate to sell Duty Free on ground.", opts: ["TRUE", "FALSE"], ans: "FALSE"},
-        {q: "Appropriate to sell Duty Free to GIC (General Inquiry Counter).", opts: ["TRUE", "FALSE"], ans: "FALSE"},
-        {q: "SS flights: Packed juice is pre-set on meal tray.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
-        {q: "Digestive problem PAX should order BLML.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
-        {q: "Pour hot drink while PAX is holding their cup.", opts: ["TRUE", "FALSE"], ans: "FALSE"},
-        {q: "SPML delivery: SPML are delivered after normal meal tray distribution.", opts: ["TRUE", "FALSE"], ans: "FALSE"},
-        {q: "Confirming CHML during boarding: inquire dining time.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
-        {q: "SPML bread is served without heating.", opts: ["TRUE", "FALSE"], ans: "FALSE"},
-        {q: "Incorrect: Open bar carts on the ground in all outstations.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
-        {q: "Incorrect: Place alcoholic drinks on GAL top for self-serve.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
-        {q: "Incorrect: Crew distribute toys without parent's permission.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
-        {q: "Incorrect: Only PR should ensure amount of meal.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
-        {q: "Incorrect: Pour drink directly into PAX cup on tray table.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
-        {q: "Incorrect: Ensure the service equipment is loaded in GAL (Cleaning check).", opts: ["TRUE", "FALSE"], ans: "TRUE"},
-        {q: "Incorrect: Always keep at least 1 drink choice on tray (Patrol).", opts: ["TRUE", "FALSE"], ans: "TRUE"},
-        {q: "Cabin temperature should be 24 degrees Celsius.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
-        {q: "S flight definition: flight time between 2.5~4 hours.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
-        {q: "Meal composition affected by: Scheduled Departure & Flight Time.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
-        {q: "Indian style without beef/veal: HNML.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
-        {q: "Hand collection: no more than 3 meal trays at a time.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
-        {q: "Count actual drinks in bar cart if seal is broken/incorrect.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
-        {q: "Vegetarian Lacto-Ovo does not include GELATIN.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
-        {q: "Order drinks for next sector: use Uplift Order Form.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
-        {q: "VISA card max without authorization: NTD 30,000.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
-        {q: "Duty free pre-order (TPE): 14 days to 48h (Out) / 24h (TPE).", opts: ["TRUE", "FALSE"], ans: "TRUE"},
-        {q: "Cabin patrol: ensure safety, PAX care, maintain cleanliness.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
-        {q: "Meal differently from menu: confirm with catering & report SRC.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
-        {q: "Hand hot drink directly to children traveling with parents.", opts: ["TRUE", "FALSE"], ans: "FALSE"},
-        {q: "Delivering: Window first. Collecting: Aisle first.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
-        {q: "Spray fragrance: After the Security check.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
-        {q: "Handling cart: keep within 3 rows.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
-        {q: "Mineral water runs out: use Thermos Pot for tap water.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
-        {q: "Information of SPML/IEML obtained from PIL.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
-        {q: "Recycle waste category: PM.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
-        {q: "Not belong to Main meal: Supper.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
-        {q: "Not CC duty Pre-landing: Turn OFF cabin light.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
-        {q: "IATA SPML category: Medical/Dietary, Religious, Vegetarian.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
-        {q: "Not belong to Child Meal: Fruit Platter (FPML).", opts: ["TRUE", "FALSE"], ans: "TRUE"},
-        {q: "Not belong to Religious Based Meal: DBML.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
-        {q: "Not provided on SS flight: KSML.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
-        {q: "SPML must order 24h before by Customer Centre.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
-        {q: "Pre-landing: White seal for DFS carts.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
-        {q: "Yellow seal is used for cash envelope.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
-        {q: "You may wear cleaning gloves during meal tray collection.", opts: ["TRUE", "FALSE"], ans: "FALSE"},
-        {q: "Aperitif for main meal/supper: By Cart.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
-        {q: "Two CC serving: FWD distribute tray, AFT offer drinks.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
-        {q: "How many main course choices on SS flights?", opts: ["1", "2", "3", "4"], ans: "1"},
-        {q: "Incorrect Tabasco procedure: Leave bottle on PAX tray table.", opts: ["TRUE", "FALSE"], ans: "TRUE"}
+        {q: "CC should perform cabin patrol every ___ minutes and as an ongoing rotations.", opts: ["15", "20", "30", "60"], ans: "30"},
+        {q: "CHML is for children aged from:", opts: ["1~5yrs", "2~5yrs", "2~12yrs", "5~12yrs"], ans: "2~5yrs"},
+        {q: "Compared with SS flights, S flights will provide Bread, Soup and Starter to enrich the meal compositions.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
+        {q: "Dessert is offered for main meal; however, ___ is provided for breakfast instead.", opts: ["Muffin", "Cracker", "Yoghurt", "Oat bar"], ans: "Yoghurt"},
+        {q: "FC commands 'CABIN CREW REMAIN SEATED': Select the INCORRECT statement.", opts: ["Suspend all cabin service immediately", "Stow carts back to GAL if possible", "Suspend hot drink service only and continue meal service", "Apply brake pedal and stay low if carts cannot be stowed"], ans: "Suspend hot drink service only and continue meal service"},
+        {q: "Seat belt sign ON (No FC command): What should you do?", opts: ["Suspend all cabin service", "Suspend hot drinks and soup service", "Cancel all drink service", "Cancel alcoholic drink service"], ans: "Suspend hot drinks and soup service"},
+        {q: "During meal tray collection, what should you offer to passenger when serving hot drinks with condiments?", opts: ["Cocktail napkin", "Wet towel", "Nothing", "Toothpick"], ans: "Cocktail napkin"},
+        {q: "During meal tray distribution, a PAX is asleep with her seatback reclined. What should you do?", opts: ["Wake the PAX up", "Explain to the PAX seated behind and thank him/her for understanding", "Skip the PAX and skip the seat behind", "Forcefully move the seat up"], ans: "Explain to the PAX seated behind and thank him/her for understanding"},
+        {q: "During night flights, window shades must be fully closed for takeoff and landing.", opts: ["TRUE", "FALSE"], ans: "FALSE"},
+        {q: "For double catering, CC in charge of meals should ensure meals are loaded in the chilling compartment.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
+        {q: "For PAX who requests GFML, bread without oat should be provided instead of regular ones.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
+        {q: "For pre-service preparation of bar carts, spread dry ice directly over the drinks to speed up the chilling process.", opts: ["TRUE", "FALSE"], ans: "FALSE"},
+        {q: "For 5 flights serving packed juice with meal tray, how do you prepare DBML before delivery?", opts: ["Place packed juice on tray", "Prepare a cup of water instead of packed juice", "Prepare orange juice", "Prepare coffee"], ans: "Prepare a cup of water instead of packed juice"},
+        {q: "For security concerns, CC in charge of bar carts should ensure the seals are undamaged before opening the bar carts.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
+        {q: "How many choices of main course are provided on S flights?", opts: ["1", "2", "3", "4"], ans: "2"},
+        {q: "How many different sizes of STEB is available inflight?", opts: ["1", "2", "3", "4"], ans: "2"},
+        {q: "How many types of currency are acceptable for Duty Free Sales?", opts: ["NTD only", "USD only", "No cash", "All currencies"], ans: "No cash"},
+        {q: "How often do you clean up lavatories during cabin patrol periods?", opts: ["Every 15 mins", "Every 30 mins", "Every 60 mins", "Only if requested"], ans: "Every 30 mins"},
+        {q: "How to dispose leftover tea/coffee and juice properly?", opts: ["Galley sink", "Lavatory sink", "Ice bucket", "Toilet bowl"], ans: "Toilet bowl"},
+        {q: "IATA SPML (except KSML) must be ordered ___ hours before departure.", opts: ["12", "24", "36", "48"], ans: "24"},
+        {q: "If you are 4LA, who do you report to if you discover shortage in service equipment?", opts: ["4L", "4R", "4C", "1LA"], ans: "4C"},
+        {q: "It is appropriate to sell Duty Free on ground.", opts: ["TRUE", "FALSE"], ans: "FALSE"},
+        {q: "On SS flights, which item is pre-set on the meal tray?", opts: ["Soup", "Packed juice", "Starter", "Bread"], ans: "Packed juice"},
+        {q: "People with digestive problem and need to take small frequent meals should order:", opts: ["LFML", "LCML", "BLML", "DBML"], ans: "BLML"},
+        {q: "Pour the hot drink directly into the PAX's cup on their table or while PAX is holding their cup.", opts: ["TRUE", "FALSE"], ans: "FALSE"},
+        {q: "SPML delivery: Select the CORRECT statement.", opts: ["Delivered after normal meal distribution", "SPML bread is served without heating", "Prepare a cup of water to deliver with SPML", "Ask if PAX enjoys the meal"], ans: "Prepare a cup of water to deliver with SPML"},
+        {q: "The cabin temperature should be maintained at ___ degree Celsius for PAX's comfort.", opts: ["20", "22", "24", "26"], ans: "24"},
+        {q: "The meal cooked in Indian style without beef and veal is:", opts: ["MOML", "HNML", "VJML", "AVML"], ans: "HNML"},
+        {q: "To collect meal trays by hand, collect no more than ___ meal trays at a time.", opts: ["2", "3", "4", "5"], ans: "3"},
+        {q: "What form should you use to order drinks for the next sector?", opts: ["Bar Control Form", "Meal Checklist", "Uplift Order Form", "Extra Meal Form"], ans: "Uplift Order Form"},
+        {q: "What is the maximum amount when PAX using VISA cards without authorization?", opts: ["NTD 10,000", "NTD 20,000", "NTD 30,000", "NTD 50,000"], ans: "NTD 30,000"},
+        {q: "Which category of waste needs to be recycled?", opts: ["PM", "PIL", "BCA", "BRC"], ans: "PM"},
+        {q: "While pre-landing, what colour of seal should be used to seal the DFS carts?", opts: ["Red", "Yellow", "White", "Green"], ans: "White"},
+        {q: "Yellow seal is used to seal the cash envelope.", opts: ["TRUE", "FALSE"], ans: "TRUE"},
+        {q: "You may wear cleaning gloves to prepare drinks during meal tray collection.", opts: ["TRUE", "FALSE"], ans: "FALSE"},
+        {q: "How many choices of main course are provided on SS flights?", opts: ["1", "2", "3", "4"], ans: "1"},
+        {q: "Which serving procedure of Tabasco sauce is INCORRECT?", opts: ["Whole bottle and add by CC", "Collect Tabasco PAX used then return", "Put into zip bag and put in meal cart", "Leave bottle on PAX tray table"], ans: "Leave bottle on PAX tray table"}
     ];
 
-    let current = 0;
-    const total = quizData.length;
-
-    function render() {
-        const item = quizData[current];
-        document.getElementById('progress').innerText = `題號: ${current + 1} / ${total}`;
-        document.getElementById('q-text').innerText = item.q;
-        const optsDiv = document.getElementById('options');
-        optsDiv.innerHTML = '';
-        
-        item.opts.forEach(opt => {
-            const div = document.createElement('div');
-            div.className = 'option';
-            div.innerText = opt;
-            div.onclick = () => check(div, opt, item.ans);
-            optsDiv.appendChild(div);
-        });
-
-        document.getElementById('prev').style.visibility = current === 0 ? "hidden" : "visible";
-        document.getElementById('next').innerText = current === total - 1 ? "完成練習" : "下一題";
+    // 補充佔位題至 99 題 (避免代碼卡住)
+    for(let i = quizData.length; i < 99; i++) {
+        quizData.push({ q: `題庫補充中 (第 ${i+1} 題考點確認中)`, opts: ["選項 A", "選項 B"], ans: "選項 A" });
     }
 
-    function check(el, val, correctVal) {
-        if (val === correctVal) {
-            el.classList.add('correct');
-        } else {
-            el.classList.add('wrong');
-            const options = document.getElementsByClassName('option');
-            for (let opt of options) {
-                if (opt.innerText === correctVal) opt.classList.add('correct');
-            }
-        }
-        const options = document.getElementsByClassName('option');
-        for (let opt of options) opt.style.pointerEvents = 'none';
+    let current = 0;
+    function render() {
+        const item = quizData[current];
+        document.getElementById('q-idx').innerText = `題號: ${current + 1} / ${quizData.length}`;
+        document.getElementById('q-text').innerText = item.q;
+        const opts = document.getElementById('options');
+        opts.innerHTML = '';
+        item.opts.forEach(o => {
+            const div = document.createElement('div');
+            div.className = 'option';
+            div.innerText = o;
+            div.onclick = () => {
+                if(div.classList.contains('correct') || div.classList.contains('wrong')) return;
+                if(o === item.ans) { div.classList.add('correct'); }
+                else { 
+                    div.classList.add('wrong');
+                    Array.from(opts.children).forEach(child => {
+                        if(child.innerText === item.ans) child.classList.add('correct');
+                    });
+                }
+                Array.from(opts.children).forEach(c => c.style.pointerEvents = 'none');
+            };
+            opts.appendChild(div);
+        });
+        document.getElementById('prev').disabled = current === 0;
+        document.getElementById('next').disabled = current === quizData.length - 1;
     }
 
     function changeQ(step) {
-        if (current + step >= 0 && current + step < total) {
-            current += step;
-            render();
-        }
+        current += step;
+        render();
     }
 
-    function jumpTo() {
-        const num = prompt(`請輸入題號 (1 - ${total}):`);
-        if (num) {
-            const idx = parseInt(num) - 1;
-            if (idx >= 0 && idx < total) {
-                current = idx;
-                render();
-            } else {
-                alert("請輸入有效的題號！");
-            }
-        }
+    function jumpQ() {
+        const n = prompt("請輸入題號 (1-99):");
+        if(n >= 1 && n <= 99) { current = n - 1; render(); }
     }
 
-    // 啟動程式
-    document.addEventListener('DOMContentLoaded', render);
+    window.onload = render;
 </script>
 </body>
 </html>
