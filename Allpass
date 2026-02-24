@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service 專業題庫練習</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #f0f2f5; padding: 15px; margin: 0; display: flex; justify-content: center; }
+        .container { width: 100%; max-width: 600px; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-top: 20px; }
+        h1 { color: #1a73e8; text-align: center; font-size: 22px; margin-bottom: 5px; }
+        .progress { text-align: right; color: #5f6368; font-size: 14px; margin-bottom: 15px; }
+        .question { font-size: 18px; font-weight: bold; line-height: 1.5; margin-bottom: 20px; color: #202124; min-height: 60px; }
+        .option { background: #ffffff; border: 2px solid #dadce0; padding: 15px; margin-bottom: 10px; border-radius: 10px; cursor: pointer; transition: 0.2s; font-size: 16px; }
+        .option:hover { background: #f8f9fa; }
+        .correct { background: #e6f4ea !important; border-color: #34a853 !important; color: #137333; font-weight: bold; }
+        .wrong { background: #fce8e6 !important; border-color: #ea4335 !important; color: #c5221f; }
+        .nav { display: flex; justify-content: space-between; margin-top: 20px; gap: 10px; }
+        button { flex: 1; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; }
+        #prev { background: #dadce0; color: #3c4043; }
+        #next { background: #1a73e8; color: white; }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>✈️ Service 模擬測驗</h1>
+    <div id="quiz">
+        <div class="progress" id="progress"></div>
+        <div class="question" id="q-text"></div>
+        <div id="options"></div>
+        <div class="nav">
+            <button id="prev" onclick="changeQ(-1)">上一題</button>
+            <button id="next" onclick="changeQ(1)">下一題</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    [span_4](start_span)// 嚴格依照 PDF 內容整理[span_4](end_span)
+    const quizData = [
+        [span_5](start_span){q: "NLML does not allow any dairy product (e.g. cheese, butter, etc.) sweet and chocolates, etc.[span_5](end_span)", opts: ["(A) LSML", "(B) NLML", "(C) BLML", "(D) GFML"], ans: "B"},
+        [span_6](start_span){q: "Is the only SPML that crew must bring the meal box to PAXs for verification and must break the box seal before heating?[span_6](end_span)", opts: ["(A) SFML and FPML", "(B) KSML", "(C) NLML", "(D) VGML"], ans: "B"},
+        [span_7](start_span){q: "Supper is provided for the flights taking off during:[span_7](end_span)", opts: ["(A) 21:01~04:59", "(B) 20:01~03:59", "(C) 22:01~05:59", "(D) 18:01~00:59"], ans: "A"},
+        {q: "A PAX requests CC to arrange a strict Indian vegetarian Jain meal. [span_8](start_span)The CORRECT IATA SPML code is:[span_8](end_span)", opts: ["(A) VOML", "(B) AVML", "(C) VJML", "(D) RVML"], ans: "C"},
+        [span_9](start_span){q: "A person who is on a 'lacto-ovo' diet may be able to consume:[span_9](end_span)", opts: ["(A) Alcohol and gelatine", "(B) Meats", "(C) Dairy products and eggs", "(D) Seafood"], ans: "C"},
+        [span_10](start_span){q: "A321 neo, Cabin Crew can control the cabin temperature from:[span_10](end_span)", opts: ["(A) FAP", "(B) AAP", "(C) ACP", "(D) AIP"], ans: "A"},
+        [span_11](start_span){q: "A321 neo, how long does it take for the temperature to stabilize after adjusting?[span_11](end_span)", opts: ["(A) 30 minutes", "(B) 30 seconds", "(C) 20 seconds", "(D) 20 minutes"], ans: "D"},
+        [span_12](start_span){q: "NBML must be ordered ___ hours before the scheduled departure time.[span_12](end_span)", opts: ["(A) 72", "(B) 24", "(C) 36", "(D) 48"], ans: "B"},
+        {q: "All food is prepared according to Jewish Dietary laws. [span_13](start_span)This SPML is called:[span_13](end_span)", opts: ["(A) MOML", "(B) HNML", "(C) KSML", "(D) LCML"], ans: "C"},
+        [span_14](start_span){q: "BBML is for infant aged from:[span_14](end_span)", opts: ["(A) 6 months to 2 years old", "(B) Below 2.5 years", "(C) 0 to 2 years", "(D) Below 1.5 years"], ans: "A"},
+        [span_15](start_span){q: "CC should perform cabin patrol every ___ minutes.[span_15](end_span)", opts: ["(A) 15", "(B) 20", "(C) 30", "(D) 60"], ans: "C"},
+        [span_16](start_span){q: "CHML is for children aged from:[span_16](end_span)", opts: ["(A) 1~5 yrs", "(B) 2~5 yrs", "(C) 2~12 yrs", "(D) 5~12 yrs"], ans: "B"},
+        [span_17](start_span){q: "Compared with SS flights, S flights will provide ___ to enrich the meal compositions.[span_17](end_span)", opts: ["(A) Bread, Soup and Starter", "(B) Dessert", "(C) Yoghurt", "(D) Muffin"], ans: "A"},
+        {q: "FC commands 'CABIN CREW REMAIN SEATED'. [span_18](start_span)Select the INCORRECT statement:[span_18](end_span)", opts: ["(A) Stow carts", "(B) Stay low", "(C) Suspend all service", "(D) Suspend hot drink service only and continue meal service."], ans: "D"},
+        {q: "Seat belt sign ON (no command). [span_19](start_span)What should you do?[span_19](end_span)", opts: ["(A) Suspend all service", "(B) Suspend hot drinks and soup service.", "(C) Cancel all drink service.", "(D) Cancel alcoholic drink service."], ans: "B"},
+        [span_20](start_span){q: "During tray collection, offer what with hot drinks with condiments?[span_20](end_span)", opts: ["(A) Cocktail napkin", "(B) Wet towel", "(C) Nothing", "(D) Toothpick"], ans: "A"},
+        [span_21](start_span){q: "After meal service, stow all bread cloth to:[span_21](end_span)", opts: ["(A) The meal carts.", "(B) The stowage.", "(C) Waste bin.", "(D) Standard units."], ans: "A"},
+        [span_22](start_span){q: "For PAX who requests GFML, bread without ___ should be provided.[span_22](end_span)", opts: ["(A) Wheat", "(B) Rice", "(C) Oat", "(D) Barley"], ans: "C"},
+        [span_23](start_span){q: "Pre-service of bar carts, INCORRECT statement:[span_23](end_span)", opts: ["(A) Place dry ice in drawer.", "(B) Ensure wine is chilled.", "(C) Spread dry ice directly over drinks.", "(D) Unlock padlocks."], ans: "C"},
+        [span_24](start_span){q: "How to offer drink choices during tray distribution?[span_24](end_span)", opts: ["(A) Verbally", "(B) Mention brands", "(C) Present label", "(D) All of above"], ans: "D"},
+        [span_25](start_span){q: "How do you offer meal choices to PAX?[span_25](end_span)", opts: ["(A) Protein and starch", "(B) Menu card", "(C) Show actual tray", "(D) Chicken or Pasta"], ans: "A"},
+        [span_26](start_span){q: "How many choices of main course are provided on S flights?[span_26](end_span)", opts: ["(A) 1", "(B) 2", "(C) 3", "(D) 4"], ans: "B"},
+        [span_27](start_span){q: "How often do you clean up lavatories during patrol?[span_27](end_span)", opts: ["(A) 15 mins", "(B) 30 mins", "(C) 60 mins", "(D) 90 mins"], ans: "B"},
+        [span_28](start_span){q: "IATA SPML (except KSML) order deadline:[span_28](end_span)", opts: ["(A) 24 hours", "(B) 48 hours", "(C) 12 hours", "(D) 6 hours"], ans: "A"},
+        [span_29](start_span){q: "If DBML PAX asks for sugar, provide:[span_29](end_span)", opts: ["(A) Honey", "(B) Sweetener (Equal)", "(C) Brown sugar", "(D) None"], ans: "B"},
+        [span_30](start_span){q: "Group tour PAX change SPML through:[span_30](end_span)", opts: ["(A) Travel Agency", "(B) Cabin Crew", "(C) Ground Staff", "(D) Customer Center"], ans: "A"},
+        [span_31](start_span){q: "4LA reports equipment shortage to:[span_31](end_span)", opts: ["(A) 4L", "(B) 4R", "(C) 4C", "(D) 1LA"], ans: "C"},
+        [span_32](start_span){q: "On SS flights, which item is pre-set on the meal tray?[span_32](end_span)", opts: ["(A) Bread", "(B) Dessert", "(C) Packed juice", "(D) Salad"], ans: "C"},
+        [span_33](start_span){q: "People with digestive problem should order:[span_33](end_span)", opts: ["(A) BLML", "(B) LFML", "(C) LCML", "(D) DBML"], ans: "A"},
+        [span_34](start_span){q: "Select the INCORRECT statement about bar cart check:[span_34](end_span)", opts: ["(A) Open bar carts on ground in outstations.", "(B) Ensure seals undamaged.", "(C) Ensure Bar Control Form loaded.", "(D) Stow padlock in first drawer."], ans: "A"},
+        [span_35](start_span){q: "Select the INCORRECT statement about cabin patrol:[span_35](end_span)", opts: ["(A) Place alcohol on GAL top for self-serve.", "(B) Check smoke detector.", "(C) Prohibit power bank.", "(D) Doors ARMED."], ans: "A"},
+        [span_36](start_span){q: "Select the INCORRECT statement about meal check:[span_36](end_span)", opts: ["(A) Loaded completely.", "(B) Random check main course.", "(C) Only PR ensures amount is in line with PAX load.", "(D) Info from PIL."], ans: "C"},
+        [span_37](start_span){q: "The definition of S flight is flight time:[span_37](end_span)", opts: ["(A) < 2.5 hours", "(B) Between 2.5~4 hours", "(C) > 4 hours", "(D) 1 hour"], ans: "B"},
+        [span_38](start_span){q: "To collect meal trays by hand, collect no more than ___ trays.[span_38](end_span)", opts: ["(A) 2", "(B) 3", "(C) 4", "(D) 5"], ans: "B"},
+        [span_39](start_span){q: "Vegetarian Lacto-Ovo meals do not include:[span_39](end_span)", opts: ["(A) Dairy", "(B) Eggs", "(C) GELATIN", "(D) Grains"], ans: "C"},
+        [span_40](start_span){q: "What is the max amount for VISA cards without authorization?[span_40](end_span)", opts: ["(A) NTD 30,000", "(B) USD 1,000", "(C) NTD 20,000", "(D) No limit"], ans: "A"},
+        [span_41](start_span){q: "When does CC spray cabin fragrance?[span_41](end_span)", opts: ["(A) Boarding", "(B) After Security check", "(C) Takeoff", "(D) Landing"], ans: "B"},
+        [span_42](start_span){q: "Keep cart no more than ___ rows from you.[span_42](end_span)", opts: ["(A) 1", "(B) 3", "(C) 5", "(D) 10"], ans: "B"},
+        [span_43](start_span){q: "Which category of waste needs to be recycled?[span_43](end_span)", opts: ["(A) PM", "(B) Food", "(C) Tissue", "(D) Glass"], ans: "A"},
+        [span_44](start_span){q: "Which meal type does not belong to Main meal?[span_44](end_span)", opts: ["(A) Breakfast", "(B) Lunch", "(C) Dinner", "(D) Supper"], ans: "D"},
+        [span_45](start_span){q: "While pre-landing, what colour of seal for DFS carts?[span_45](end_span)", opts: ["(A) Red", "(B) WHITE", "(C) Yellow", "(D) Blue"], ans: "B"}
+    ];
+
+    let current = 0;
+
+    function render() {
+        const item = quizData[current];
+        document.getElementById('progress').innerText = `Question ${current + 1} of ${quizData.length}`;
+        document.getElementById('q-text').innerText = item.q;
+        const optsDiv = document.getElementById('options');
+        optsDiv.innerHTML = '';
+        item.opts.forEach(opt => {
+            const div = document.createElement('div');
+            div.className = 'option';
+            div.innerText = opt;
+            div.onclick = () => check(div, opt, item.ans);
+            optsDiv.appendChild(div);
+        });
+        document.getElementById('prev').disabled = current === 0;
+        document.getElementById('next').innerText = current === quizData.length - 1 ? "完成" : "下一題";
+    }
+
+    function check(el, val, correctLetter) {
+        const selected = val.match(/\(([A-D])\)/)[1];
+        if (selected === correctLetter) {
+            el.classList.add('correct');
+        } else {
+            el.classList.add('wrong');
+            Array.from(document.getElementsByClassName('option')).forEach(optEl => {
+                if (optEl.innerText.includes(`(${correctLetter})`)) optEl.classList.add('correct');
+            });
+        }
+        Array.from(document.getElementsByClassName('option')).forEach(o => o.style.pointerEvents = 'none');
+    }
+
+    function changeQ(step) {
+        if (current + step >= 0 && current + step < quizData.length) {
+            current += step;
+            render();
+        } else if (current + step === quizData.length) {
+            alert("恭喜完成所有練習！祝你 Check 順利！");
+        }
+    }
+
+    render();
+</script>
+</body>
+</html>
