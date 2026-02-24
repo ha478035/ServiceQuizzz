@@ -3,97 +3,112 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Service Exam Practice</title>
+    <title>Service 專業題庫練習</title>
     <style>
-        body { font-family: -apple-system, sans-serif; background: #f4f7f9; padding: 20px; display: flex; justify-content: center; }
-        .quiz-container { max-width: 600px; width: 100%; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
-        h1 { color: #007aff; text-align: center; font-size: 24px; margin-bottom: 10px; }
-        .progress { color: #8e8e93; text-align: center; margin-bottom: 20px; font-size: 14px; }
-        .question { font-size: 18px; font-weight: 600; line-height: 1.4; margin-bottom: 25px; color: #1c1c1e; }
-        .option { background: #f1f1f7; padding: 16px; margin-bottom: 12px; border-radius: 12px; cursor: pointer; border: 2px solid transparent; transition: 0.2s; }
-        .option:hover { background: #e5e5ea; }
-        .correct { background: #34c759 !important; color: white; border-color: #34c759; }
-        .wrong { background: #ff3b30 !important; color: white; border-color: #ff3b30; }
-        .nav-buttons { display: flex; justify-content: space-between; margin-top: 30px; gap: 15px; }
-        button { flex: 1; padding: 15px; border: none; border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; }
-        #prev-btn { background: #e5e5ea; color: #000; }
-        #next-btn { background: #007aff; color: #white; }
-        button:disabled { opacity: 0.3; cursor: not-allowed; }
+        body { font-family: -apple-system, sans-serif; background: #f0f2f5; padding: 15px; margin: 0; display: flex; justify-content: center; }
+        .container { width: 100%; max-width: 600px; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-top: 20px; position: relative; }
+        h1 { color: #1a73e8; text-align: center; font-size: 20px; margin-bottom: 5px; }
+        .header-tools { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .progress { color: #5f6368; font-size: 14px; }
+        .jump-btn { background: #f8f9fa; border: 1px solid #dadce0; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 13px; color: #1a73e8; }
+        .question { font-size: 17px; font-weight: bold; line-height: 1.5; margin-bottom: 20px; color: #202124; min-height: 80px; }
+        .option { background: #ffffff; border: 2px solid #dadce0; padding: 12px; margin-bottom: 10px; border-radius: 10px; cursor: pointer; transition: 0.2s; font-size: 15px; }
+        .correct { background: #e6f4ea !important; border-color: #34a853 !important; color: #137333; font-weight: bold; }
+        .wrong { background: #fce8e6 !important; border-color: #ea4335 !important; color: #c5221f; }
+        .nav { display: flex; justify-content: space-between; margin-top: 20px; gap: 10px; }
+        button.nav-btn { flex: 1; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; }
+        #prev { background: #dadce0; color: #3c4043; }
+        #next { background: #1a73e8; color: white; }
     </style>
 </head>
 <body>
-    <div class="quiz-container">
-        <h1>✈️ Service Quiz</h1>
-        <div class="progress" id="progress">載入中...</div>
-        <div id="quiz-area">
-            <div class="question" id="question-text"></div>
-            <div id="options-container"></div>
-            <div class="nav-buttons">
-                <button id="prev-btn" onclick="prevQ()">上一題</button>
-                <button id="next-btn" onclick="nextQ()">下一題</button>
-            </div>
+<div class="container">
+    <h1>✈️ Service Quiz</h1>
+    <div class="header-tools">
+        <div class="progress" id="progress"></div>
+        <button class="jump-btn" onclick="jumpTo()">🔢 跳轉題號</button>
+    </div>
+    <div id="quiz">
+        <div class="question" id="q-text"></div>
+        <div id="options"></div>
+        <div class="nav">
+            <button id="prev" class="nav-btn" onclick="changeQ(-1)">上一題</button>
+            <button id="next" class="nav-btn" onclick="changeQ(1)">下一題</button>
         </div>
     </div>
+</div>
 
-    <script>
-        const quizData = [
-            {q: "NLML does not allow any dairy product (e.g. cheese, butter, etc.) sweet and chocolates, etc.", opts: ["LSML", "NLML", "BLML", "GFML"], ans: "NLML"},
-            {q: "Is the only SPML that crew must bring the meal box to PAXs for verification and must break the box seal before heating.", opts: ["SFML and FPML", "KSML", "NLML", "VGML"], ans: "KSML"},
-            {q: "Supper is provided for the flights taking off during:", opts: ["21:01~04:59", "20:01~03:59", "22:01~05:59", "18:01~00:59"], ans: "21:01~04:59"},
-            {q: "A PAX requests CC to arrange a strict Indian vegetarian Jain meal. The CORRECT IATA code is:", opts: ["VOML", "AVML", "VJML", "RVML"], ans: "VJML"},
-            {q: "A person who is on a 'lacto-ovo' diet may be able to consume:", opts: ["Alcohol and gelatine", "Meats", "Dairy products and eggs", "Seafood"], ans: "Dairy products and eggs"},
-            {q: "A321 neo, Cabin Crew can control the cabin temperature from:", opts: ["FAP", "AAP", "ACP", "AIP"], ans: "FAP"},
-            {q: "A321 neo, how long does it take for the temperature to stabilize after adjusting?", opts: ["30 minutes", "30 seconds", "20 seconds", "20 minutes"], ans: "20 minutes"},
-            {q: "NBML must be ordered ___ hours before the scheduled departure time.", opts: ["72", "24", "36", "48"], ans: "24"},
-            {q: "CC should perform cabin patrol every ___ minutes.", opts: ["15", "20", "30", "60"], ans: "30"},
-            {q: "Vegetarian Lacto-Ovo meals do not include:", opts: ["Dairy", "Eggs", "GELATIN", "Grains"], ans: "GELATIN"},
-            {q: "The definition of S flight is the scheduled flight time:", opts: ["< 2.5 hours", "Between 2.5~4 hours", "> 4 hours", "1 hour"], ans: "Between 2.5~4 hours"},
-            {q: "While pre-landing, what colour of seal should be used to seal the DFS carts?", opts: ["Red", "WHITE", "Yellow", "Blue"], ans: "WHITE"}
-        ];
+<script>
+    // 嚴格對照 Service.pdf 內容
+    const quizData = [
+        {q: "NLML does not allow any dairy product (e.g. cheese, butter, etc.) sweet and chocolates, etc.", opts: ["(A) LSML", "(B) NLML", "(C) BLML", "(D) GFML"], ans: "B"},
+        {q: "Is the only SPML that crew must bring the meal box to PAXs for verification and must break the box seal before heating?", opts: ["(A) SFML and FPML", "(B) KSML", "(C) NLML", "(D) VGML"], ans: "B"},
+        {q: "Supper is provided for the flights taking off during:", opts: ["(A) 21:01~04:59", "(B) 20:01~03:59", "(C) 22:01~05:59", "(D) 18:01~00:59"], ans: "A"},
+        {q: "A PAX requests CC to arrange a strict Indian vegetarian Jain meal. The CORRECT IATA SPML code is:", opts: ["(A) VOML", "(B) AVML", "(C) VJML", "(D) RVML"], ans: "C"},
+        {q: "A person who is on a 'lacto-ovo' diet may be able to consume:", opts: ["(A) Alcohol and gelatine", "(B) Meats", "(C) Dairy products and eggs", "(D) Seafood"], ans: "C"},
+        {q: "A321 neo, Cabin Crew can control the cabin temperature from:", opts: ["(A) FAP", "(B) AAP", "(C) ACP", "(D) AIP"], ans: "A"},
+        {q: "A321 neo, how long does it take for the temperature to stabilize after adjusting?", opts: ["(A) 30 minutes", "(B) 30 seconds", "(C) 20 seconds", "(D) 20 minutes"], ans: "D"},
+        {q: "NBML must be ordered ___ hours before the scheduled departure time.", opts: ["(A) 72", "(B) 24", "(C) 36", "(D) 48"], ans: "B"},
+        {q: "CC should perform cabin patrol every ___ minutes.", opts: ["(A) 15", "(B) 20", "(C) 30", "(D) 60"], ans: "C"},
+        {q: "The definition of S flight is flight time:", opts: ["(A) < 2.5 hours", "(B) Between 2.5~4 hours", "(C) > 4 hours", "(D) 1 hour"], ans: "B"},
+        {q: "Vegetarian Lacto-Ovo meals do not include:", opts: ["(A) Dairy", "(B) Eggs", "(C) GELATIN", "(D) Grains"], ans: "C"},
+        {q: "While pre-landing, what colour of seal for DFS carts?", opts: ["(A) Red", "(B) WHITE", "(C) Yellow", "(D) Blue"], ans: "B"},
+        {q: "Select the INCORRECT statement about meal check.", opts: ["(A) Meals loaded completely", "(B) Randomly check main course", "(C) Only PR ensure meal amount", "(D) SPML info from PIL"], ans: "C"},
+        {q: "Select the INCORRECT statement about service equipment check.", opts: ["(A) Ensure the service equipment is loaded in GAL", "(B) Check drinks", "(C) Check ovens", "(D) None"], ans: "A"}
+        // ... 此處可依 PDF 繼續添加更多題目
+    ];
 
-        let currentQ = 0;
+    let current = 0;
 
-        function showQ() {
-            const data = quizData[currentQ];
-            document.getElementById('progress').innerText = `第 ${currentQ + 1} 題 / 共 ${quizData.length} 題`;
-            document.getElementById('question-text').innerText = data.q;
-            const container = document.getElementById('options-container');
-            container.innerHTML = '';
-            data.opts.forEach(opt => {
-                const div = document.createElement('div');
-                div.className = 'option';
-                div.innerText = opt;
-                div.onclick = () => {
-                    if (div.innerText === data.ans) {
-                        div.classList.add('correct');
-                    } else {
-                        div.classList.add('wrong');
-                        Array.from(container.children).forEach(child => {
-                            if (child.innerText === data.ans) child.classList.add('correct');
-                        });
-                    }
-                    Array.from(container.children).forEach(child => child.style.pointerEvents = 'none');
-                };
-                container.appendChild(div);
+    function render() {
+        const item = quizData[current];
+        document.getElementById('progress').innerText = `題號: ${current + 1} / ${quizData.length}`;
+        document.getElementById('q-text').innerText = item.q;
+        const optsDiv = document.getElementById('options');
+        optsDiv.innerHTML = '';
+        item.opts.forEach(opt => {
+            const div = document.createElement('div');
+            div.className = 'option';
+            div.innerText = opt;
+            div.onclick = () => check(div, opt, item.ans);
+            optsDiv.appendChild(div);
+        });
+        document.getElementById('prev').disabled = current === 0;
+        document.getElementById('next').disabled = current === quizData.length - 1;
+    }
+
+    function check(el, val, correctLetter) {
+        const selected = val.match(/\(([A-D])\)/)[1];
+        if (selected === correctLetter) {
+            el.classList.add('correct');
+        } else {
+            el.classList.add('wrong');
+            Array.from(document.getElementsByClassName('option')).forEach(optEl => {
+                if (optEl.innerText.includes(`(${correctLetter})`)) optEl.classList.add('correct');
             });
-            document.getElementById('prev-btn').disabled = currentQ === 0;
         }
+        Array.from(document.getElementsByClassName('option')).forEach(o => o.style.pointerEvents = 'none');
+    }
 
-        function nextQ() {
-            if (currentQ < quizData.length - 1) {
-                currentQ++;
-                showQ();
+    function changeQ(step) {
+        current += step;
+        render();
+    }
+
+    function jumpTo() {
+        const num = prompt(`請輸入題號 (1 - ${quizData.length}):`);
+        if (num !== null) {
+            const index = parseInt(num) - 1;
+            if (index >= 0 && index < quizData.length) {
+                current = index;
+                render();
+            } else {
+                alert("請輸入有效的題號！");
             }
         }
+    }
 
-        function prevQ() {
-            if (currentQ > 0) {
-                currentQ--;
-                showQ();
-            }
-        }
-
-        showQ();
-    </script>
+    render();
+</script>
 </body>
 </html>
